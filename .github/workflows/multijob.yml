@@ -1,0 +1,47 @@
+name: Multi Job workflow
+
+on: 
+  push
+
+jobs:
+    deploy_job1:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Install Cowsay Program
+          run: sudo apt-get install
+
+        - name: Execute Cowsay CMD
+          run: cowsay -f dragon "Run for cover, I am a DRAGON...RAWAR" >> dragon.txt
+
+        - name: Upload Dragon text file
+          uses: actions/upload-artifact@v7
+          with:
+            name: dragon-text-file
+            path: dragon.txt
+
+    test_job2:
+        needs: [build_job1]
+        runs-on: ubuntu-latest
+        steps:
+        - name: Download Dragon text file
+          uses: actions/download-artifact@v8
+          with:
+            name: dragon-text-file
+
+        - name: Test file exists
+          run: grep -i "dragon" dragon.txt
+
+    deploy_job3:
+        needs: [test_job2]
+        runs-on: ubuntu-latest
+        steps:
+        - name: Download Dragon text file
+          uses: actions/download-artifact@v8
+          with:
+            name: dragon-text-file
+
+        - name: Read file
+          run: cat dragon.txt
+
+        - name: Deploy
+          run: echo "Deplying...."
