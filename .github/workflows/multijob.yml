@@ -20,7 +20,7 @@ jobs:
             path: dragon.txt
 
     test_job2:
-        needs: [build_job1]
+        needs: [deploy_job1]
         runs-on: ubuntu-latest
         steps:
         - name: Download Dragon text file
