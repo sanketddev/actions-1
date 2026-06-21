@@ -1,0 +1,32 @@
+name: Variables workflow Level
+
+on:
+  push
+
+env:
+  CONTAINER_REGISTRY: docker.io
+  DOCKER_USERNAME: sanketd
+  IMAGE_NAME: nginx
+
+jobs:
+    docker:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Docker Build
+          run: echo docker build -t $CONTAINER_REGISTRY/$DOCKER_USERNAME/$IMAGE_NAME:latest
+
+        - name: Docker login
+          env:
+            DOCKER_PASSWORD: s3cUrePaSsW0rd
+          run: echo docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD
+
+        - name: Docker Publish
+          run: echo docker push $CONTAINER_REGISTRY/$DOCKER_USERNAME/$IMAGE_NAME:latest
+          
+    deploy:
+        if: github.ref == 'refs/heads/main'
+        needs: [docker]
+        runs-on: ubuntu-latest
+        steps:
+        - name: Docker run
+          run: echo docker run -d -p 8080:80 $CONTAINER_REGISTRY/$DOCKER_USERNAME/$IMAGE_NAME:latest
